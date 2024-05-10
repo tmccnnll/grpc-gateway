@@ -160,6 +160,12 @@ type Registry struct {
 	// preserveRPCOrder, if true, will ensure the order of paths emitted in openapi swagger files mirror
 	// the order of RPC methods found in proto files. If false, emitted paths will be ordered alphabetically.
 	preserveRPCOrder bool
+
+	// joinMultilineComments, if true, will treat multiline comments as a single continuous string and will join them
+	// with a space. This is useful for preserving the formatting of comments in the generated code.
+	//
+	// Paragraphs can be separated by two newlines.
+	joinMultilineComments bool
 }
 
 type repeatedFieldSeparator struct {
@@ -874,4 +880,14 @@ func (r *Registry) SetPreserveRPCOrder(preserve bool) {
 // IsPreserveRPCOrder returns preserveRPCOrder
 func (r *Registry) IsPreserveRPCOrder() bool {
 	return r.preserveRPCOrder
+}
+
+// SetJoinMultilineComments sets joinMultilineComments
+func (r *Registry) SetJoinMultilineComments(use bool) {
+	r.joinMultilineComments = use
+}
+
+// GetJoinMultilineComments returns joinMultilineComments
+func (r *Registry) GetJoinMultilineComments() bool {
+	return r.joinMultilineComments
 }

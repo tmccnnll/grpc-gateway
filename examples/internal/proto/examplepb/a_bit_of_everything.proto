@@ -750,6 +750,16 @@ service ABitOfEverythingService {
       body: "*"
     };
   }
+
+  // This is a summary
+  //
+  // This is a description that is split
+  // over multiple lines.
+  rpc InlineDescription(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      get: "/v1/example/inlinedescription"
+    };
+  }
 }
 
 // camelCase and lowercase service names are valid but not recommended (use TitleCase instead)

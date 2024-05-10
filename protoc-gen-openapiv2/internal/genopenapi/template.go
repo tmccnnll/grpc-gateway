@@ -2400,8 +2400,18 @@ func updateOpenAPIDataFromComments(reg *descriptor.Registry, swaggerObject inter
 	// If there is a summary (or summary-equivalent) and it's empty, use the first
 	// paragraph as summary, and the rest as description.
 	if summaryValue.CanSet() {
+
 		summary := strings.TrimSpace(paragraphs[0])
-		description := strings.TrimSpace(strings.Join(paragraphs[1:], paragraphDeliminator))
+		description := strings.TrimSpace(strings.Join(func() []string {
+			if !reg.GetJoinMultilineComments() {
+				return paragraphs[1:]
+			}
+
+			for i := range paragraphs[1:] {
+				paragraphs[i+1] = strings.ReplaceAll(paragraphs[i+1], "\n", " ")
+			}
+			return paragraphs[1:]
+		}(), paragraphDeliminator))
 		if !usingTitle || (len(summary) > 0 && summary[len(summary)-1] != '.') {
 			// overrides the schema value only if it's empty
 			// keep the comment precedence when updating the package definition

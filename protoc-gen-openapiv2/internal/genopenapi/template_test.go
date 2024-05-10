@@ -6023,6 +6023,7 @@ func TestUpdateOpenAPIDataFromComments(t *testing.T) {
 		expectedOpenAPIObject interface{}
 		useGoTemplate         bool
 		goTemplateArgs        []string
+		joinMultilineComments bool
 	}{
 		{
 			descr:                 "empty comments",
@@ -6112,6 +6113,39 @@ func TestUpdateOpenAPIDataFromComments(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			descr:                "multi line comment description joined",
+			openapiSwaggerObject: &openapiOperationObject{},
+			expectedOpenAPIObject: &openapiOperationObject{
+				Summary:     "First line",
+				Description: "Second line and continuation of second line",
+			},
+			comments:              "First line\n\nSecond line\nand continuation of second line",
+			expectedError:         nil,
+			joinMultilineComments: true,
+		},
+		{
+			descr:                "multi line comment description joined",
+			openapiSwaggerObject: &openapiOperationObject{},
+			expectedOpenAPIObject: &openapiOperationObject{
+				Summary:     "First line",
+				Description: "Second line and continuation of second line\n\nThird line",
+			},
+			comments:              "First line\n\nSecond line\nand continuation of second line\n\nThird line",
+			expectedError:         nil,
+			joinMultilineComments: true,
+		},
+		{
+			descr:                "multi line comment description not joined",
+			openapiSwaggerObject: &openapiOperationObject{},
+			expectedOpenAPIObject: &openapiOperationObject{
+				Summary:     "First line",
+				Description: "Second line\nand continuation of second line",
+			},
+			comments:              "First line\n\nSecond line\nand continuation of second line",
+			expectedError:         nil,
+			joinMultilineComments: false,
+		},
+		{
 			descr:                 "multi line comment with summary no dot",
 			openapiSwaggerObject:  &schemaCore{},
 			expectedOpenAPIObject: &schemaCore{},
@@ -6188,6 +6222,10 @@ func TestUpdateOpenAPIDataFromComments(t *testing.T) {
 			if len(test.goTemplateArgs) > 0 {
 				reg.SetGoTemplateArgs(test.goTemplateArgs)
 			}
+			if test.joinMultilineComments {
+				reg.SetJoinMultilineComments(true)
+			}
+
 			err := updateOpenAPIDataFromComments(reg, test.openapiSwaggerObject, nil, test.comments, false)
 			if test.expectedError == nil {
 				if err != nil {
